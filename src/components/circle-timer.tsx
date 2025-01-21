@@ -1,10 +1,45 @@
 'use client';
 
+import Image from "next/image";
 import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { Card } from '@/components/ui/card';
-import { PlayCircle, PauseCircle } from 'lucide-react';
+import { Play, Pause } from 'lucide-react';
 
-const Circle = memo(({ radius, color, dashArray, isDragging, currentTime, isSpinning }) => (
+interface CircleProps {
+  radius: number;
+  color: string;
+  dashArray: string;
+  isDragging: boolean;
+  currentTime: number;
+  isSpinning: boolean;
+}
+
+interface WheelButtonProps {
+  label: string;
+  angle: number;
+  color: string;
+  handleButtonPress: () => void;
+  isRunning: boolean;
+}
+
+interface TimeState {
+  currentTime: number;
+  isRunning: boolean;
+  isDragging: boolean;
+  startAngle: number;
+  lastAngle: number;
+  centerX: number;
+  centerY: number;
+  isSpinning: boolean;
+}
+
+interface CircleConfig {
+  radius: number;
+  color: string;
+  dashArray: string;
+}
+
+const Circle = memo(({ radius, color, dashArray, isDragging, currentTime, isSpinning }: CircleProps) => (
   <circle
     cx="50"
     cy="50"
@@ -25,7 +60,7 @@ const Circle = memo(({ radius, color, dashArray, isDragging, currentTime, isSpin
 
 Circle.displayName = 'Circle';
 
-const WheelButton = memo(({ label, angle, color, handleButtonPress, isRunning }) => (
+const WheelButton = memo(({ label, angle, color, handleButtonPress, isRunning }: WheelButtonProps) => (
   <button
     className={`absolute w-12 h-12 flex items-center justify-center text-xl transition-all duration-300 hover:scale-110 ${
       isRunning ? 'opacity-0 pointer-events-none' : 'opacity-100'
@@ -48,8 +83,8 @@ const WheelButton = memo(({ label, angle, color, handleButtonPress, isRunning })
 
 WheelButton.displayName = 'WheelButton';
 
-const CircleTimer = () => {
-  const [timeState, setTimeState] = useState({
+const CircleTimer: React.FC = () => {
+  const [timeState, setTimeState] = useState<TimeState>({
     currentTime: 60,
     isRunning: false,
     isDragging: false,
@@ -69,13 +104,13 @@ const CircleTimer = () => {
     background: '#FFFFFF'
   }), []);
 
-  const formatTime = useCallback((seconds) => {
+  const formatTime = useCallback((seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}m${secs.toString().padStart(2, '0')}s`;
   }, []);
 
-  const adjustTime = useCallback((adjustment) => {
+  const adjustTime = useCallback((adjustment: number): void => {
     if (!timeState.isRunning) {
       setTimeState(prev => ({
         ...prev,
@@ -84,9 +119,9 @@ const CircleTimer = () => {
     }
   }, [timeState.isRunning]);
 
-  const getAngleFromEvent = useCallback((e, rect) => {
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const getAngleFromEvent = useCallback((e: React.MouseEvent | React.TouchEvent, rect: DOMRect) => {
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     const x = clientX - centerX;
@@ -94,10 +129,10 @@ const CircleTimer = () => {
     return { x, y, angle: Math.atan2(y, x), centerX, centerY };
   }, []);
 
-  const handleStart = useCallback((e) => {
+  const handleStart = useCallback((e: React.MouseEvent | React.TouchEvent): void => {
     if (!timeState.isRunning) {
-      e.preventDefault(); // Prevent scrolling on touch devices
-      const rect = e.currentTarget.getBoundingClientRect();
+      e.preventDefault();
+      const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
       const { angle, centerX, centerY } = getAngleFromEvent(e, rect);
       
       setTimeState(prev => ({
@@ -111,11 +146,11 @@ const CircleTimer = () => {
     }
   }, [timeState.isRunning, getAngleFromEvent]);
 
-  const handleMove = useCallback((e) => {
+  const handleMove = useCallback((e: React.MouseEvent | React.TouchEvent): void => {
     if (timeState.isDragging && !timeState.isRunning) {
-      e.preventDefault(); // Prevent scrolling on touch devices
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      e.preventDefault();
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
       const x = clientX - timeState.centerX;
       const y = clientY - timeState.centerY;
       const currentAngle = Math.atan2(y, x);
@@ -128,7 +163,7 @@ const CircleTimer = () => {
         deltaAngle += 2 * Math.PI;
       }
       
-      const sensitivity = 30;
+      const sensitivity = 15; // Adjust this value to change wheel sensitivity
       const timeAdjustment = Math.round((deltaAngle * sensitivity) / (Math.PI * 2) * 60);
       
       setTimeState(prev => ({
@@ -139,7 +174,7 @@ const CircleTimer = () => {
     }
   }, [timeState.isDragging, timeState.isRunning, timeState.lastAngle, timeState.centerX, timeState.centerY]);
 
-  const handleEnd = useCallback(() => {
+  const handleEnd = useCallback((): void => {
     setTimeState(prev => ({
       ...prev,
       isDragging: false
@@ -147,7 +182,7 @@ const CircleTimer = () => {
   }, []);
 
   useEffect(() => {
-    let interval;
+    let interval: NodeJS.Timeout;
     if (timeState.isRunning && timeState.currentTime > 0) {
       interval = setInterval(() => {
         setTimeState(prev => {
@@ -208,7 +243,7 @@ const CircleTimer = () => {
     }
   ], [colors, adjustTime]);
 
-  const circles = useMemo(() => [
+  const circles: CircleConfig[] = useMemo(() => [
     { radius: 48, color: colors.peach, dashArray: '75 25' },
     { radius: 44, color: colors.gold, dashArray: '65 35' },
     { radius: 40, color: colors.navy, dashArray: '55 45' },
@@ -217,7 +252,7 @@ const CircleTimer = () => {
   ], [colors]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex flex-col items-center justify-center">
       <style>
         {`
           @keyframes spin-and-fade {
@@ -230,7 +265,7 @@ const CircleTimer = () => {
           }
         `}
       </style>
-      <Card className="w-96 p-8 flex items-center justify-center my-8 backdrop-blur-md bg-white/10 border-white/20 rounded-none shadow-2xl relative z-10">
+      <Card className="w-96 px-8 py-20 flex items-center justify-center my-8 backdrop-blur-md bg-white/10 border-white/20 rounded-none shadow-2xl relative z-10">
         <div className="relative w-full">
           <svg
             className="w-full"
@@ -238,29 +273,29 @@ const CircleTimer = () => {
             style={{ transform: 'rotate(-90deg)' }}
           >
             {/* Background paths */}
-          {circles.map((circle, index) => (
-            <circle
-              key={`bg-${index}`}
-              cx="50"
-              cy="50"
-              r={circle.radius}
-              fill="none"
-              stroke="#2F485822"
-              strokeWidth="1"
-              strokeDasharray={circle.dashArray}
-            />
-          ))}
-          
-          {/* Animated circles */}
-          {circles.map((circle, index) => (
-            <Circle
-              key={index}
-              {...circle}
-              isDragging={timeState.isDragging}
-              currentTime={timeState.currentTime}
-              isSpinning={timeState.isSpinning}
-            />
-          ))}
+            {circles.map((circle, index) => (
+              <circle
+                key={`bg-${index}`}
+                cx="50"
+                cy="50"
+                r={circle.radius}
+                fill="none"
+                stroke="#2F485822"
+                strokeWidth="1"
+                strokeDasharray={circle.dashArray}
+              />
+            ))}
+            
+            {/* Animated circles */}
+            {circles.map((circle, index) => (
+              <Circle
+                key={index}
+                {...circle}
+                isDragging={timeState.isDragging}
+                currentTime={timeState.currentTime}
+                isSpinning={timeState.isSpinning}
+              />
+            ))}
           </svg>
 
           <div
@@ -298,9 +333,9 @@ const CircleTimer = () => {
                   onClick={() => setTimeState(prev => ({ ...prev, isRunning: !prev.isRunning }))}
                 >
                   {timeState.isRunning ? (
-                    <PauseCircle className="w-8 h-8" style={{ color: colors.coral }} />
+                    <Pause className="w-4 h-4" style={{ color: colors.coral }} />
                   ) : (
-                    <PlayCircle className="w-8 h-8" style={{ color: colors.teal }} />
+                    <Play className="w-4 h-4" style={{ color: colors.teal }} />
                   )}
                 </button>
               </div>
@@ -308,6 +343,19 @@ const CircleTimer = () => {
           </div>
         </div>
       </Card>
+      <a
+        href="https://www.offekt.com"
+        target="_blank"      
+      >
+        <Image
+            className="dark:invert"
+            src="/offekt_logo_20250117@2x.png"
+            alt="OFFEKT logo"
+            width={88}
+            height={27}
+            priority
+          />      
+      </a>  
     </div>
   );
 };
