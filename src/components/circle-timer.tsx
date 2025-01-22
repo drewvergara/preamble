@@ -17,7 +17,6 @@ interface CircleProps {
 interface WheelButtonProps {
   label: string;
   angle: number;
-  color: string;
   handleButtonPress: () => void;
   isRunning: boolean;
 }
@@ -60,7 +59,7 @@ const Circle = memo(({ radius, color, dashArray, isDragging, currentTime, isSpin
 
 Circle.displayName = 'Circle';
 
-const WheelButton = memo(({ label, angle, color, handleButtonPress, isRunning }: WheelButtonProps) => (
+const WheelButton = memo(({ label, angle, handleButtonPress, isRunning }: WheelButtonProps) => (
   <button
     className={`absolute w-12 h-12 flex items-center justify-center text-sm transition-all duration-300 hover:scale-125 ${
       isRunning ? 'opacity-0 pointer-events-none' : 'opacity-100'
