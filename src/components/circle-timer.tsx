@@ -162,7 +162,7 @@ const CircleTimer: React.FC = () => {
         deltaAngle += 2 * Math.PI;
       }
       
-      const sensitivity = 2; // Adjust this value to change wheel sensitivity
+      const sensitivity = 1; // Adjust this value to change wheel sensitivity
       const timeAdjustment = Math.round((deltaAngle * sensitivity) / (Math.PI * 2) * 60);
       
       setTimeState(prev => ({
