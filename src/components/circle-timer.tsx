@@ -264,7 +264,7 @@ const CircleTimer: React.FC = () => {
           }
         `}
       </style>
-      <Card className="w-96 px-8 py-20 flex items-center justify-center my-8 backdrop-blur-md bg-white/10 border-white/20 rounded-none shadow-2xl relative z-10">
+      <Card className="w-88 px-8 py-20 flex items-center justify-center my-8 backdrop-blur-md bg-white/10 border-white/20 rounded-none shadow-2xl relative z-10">
         <div className="relative w-full">
           <svg
             className="w-full"
