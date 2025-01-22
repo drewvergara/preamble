@@ -1,4 +1,3 @@
-import Image from "next/image";
 import CircleTimer from "@/components/circle-timer";
 
 export default function Home() {
@@ -6,7 +5,7 @@ export default function Home() {
     <div 
       className="bg-black min-h-full w-full justify-items-center bg-cover bg-center font-[family-name:var(--font-geist-sans)]"
       style={{
-        backgroundImage: 'url("https://offekt.s3.us-west-2.amazonaws.com/images/philippines_movie_sunrise.png")',
+        backgroundImage: 'url("/minimalist_abstract_wave.jpg")',
         backgroundColor: '#1a1a1a', // Fallback color while image loads
         backdropFilter: 'blur(5px)'
       }}      
@@ -31,7 +30,7 @@ export default function Home() {
       ></div>
       
       {/* Noise filter SVG */}
-      <svg className="absolute inset-0 w-full h-full opacity-15">
+      <svg className="absolute inset-0 w-full h-full opacity-30">
         <defs>
           <filter id="noise">
             <feTurbulence 

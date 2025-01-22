@@ -62,14 +62,14 @@ Circle.displayName = 'Circle';
 
 const WheelButton = memo(({ label, angle, color, handleButtonPress, isRunning }: WheelButtonProps) => (
   <button
-    className={`absolute w-12 h-12 flex items-center justify-center text-xl transition-all duration-300 hover:scale-110 ${
+    className={`absolute w-12 h-12 flex items-center justify-center text-sm transition-all duration-300 hover:scale-125 ${
       isRunning ? 'opacity-0 pointer-events-none' : 'opacity-100'
     }`}
     style={{
-      left: `${50 + 40 * Math.cos((angle * Math.PI) / 180)}%`,
-      top: `${50 + 40 * Math.sin((angle * Math.PI) / 180)}%`,
+      left: `${50 + 55 * Math.cos((angle * Math.PI) / 180)}%`,
+      top: `${50 + 55 * Math.sin((angle * Math.PI) / 180)}%`,
       transform: 'translate(-50%, -50%)',
-      color: color,
+      color: "#FFF",
       zIndex: 10
     }}
     onClick={(e) => {
@@ -96,11 +96,11 @@ const CircleTimer: React.FC = () => {
   });
 
   const colors = useMemo(() => ({
-    teal: '#4B9B94',
-    coral: '#E57F6C',
-    navy: '#2F4858',
-    gold: '#D6B95A',
-    peach: '#E8A17B',
+    teal: '#4a2480',
+    coral: '#c53a9d',
+    navy: '#051f39',
+    gold: '#ffffff',
+    peach: '#ff8e80',
     background: '#FFFFFF'
   }), []);
 
@@ -218,13 +218,13 @@ const CircleTimer: React.FC = () => {
 
   const segments = useMemo(() => [
     {
-      label: '◀︎',
+      label: '-',
       angle: 180,
       color: colors.peach,
       handleButtonPress: () => adjustTime(-10)
     },
     {
-      label: '▶︎',
+      label: '+',
       angle: 0,
       color: colors.gold,
       handleButtonPress: () => adjustTime(10)
@@ -325,11 +325,11 @@ const CircleTimer: React.FC = () => {
                   transform: timeState.isDragging ? 'scale(1.05)' : 'scale(1)'
                 }}
               >
-                <div className="text-sm font-mono" style={{ color: colors.navy }}>
+                <div className="text-md font-mono" style={{ color: colors.navy }}>
                   {formatTime(timeState.currentTime)}
                 </div>
                 <button
-                  className="mt-2 transition-transform duration-200 hover:scale-110"
+                  className="mt-2 transition-transform duration-200 hover:scale-125"
                   onClick={() => setTimeState(prev => ({ ...prev, isRunning: !prev.isRunning }))}
                 >
                   {timeState.isRunning ? (
@@ -345,7 +345,8 @@ const CircleTimer: React.FC = () => {
       </Card>
       <a
         href="https://www.offekt.com"
-        target="_blank"      
+        target="_blank"
+        className="z-20"
       >
         <Image
             className="dark:invert"
